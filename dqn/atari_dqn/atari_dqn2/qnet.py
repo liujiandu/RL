@@ -36,7 +36,7 @@ def qnet(state, nact, scope, reuse):
         conv3_flat = tf.reshape(conv3, [-1, 1600])
         fc4 = fc(conv3_flat,"fc4", [1600, 512],actf=tf.nn.relu)
         qvals = fc(fc4, "qval", [512, nact], actf=lambda x:x)
-    return qvals
+        return qvals
 
 
 
