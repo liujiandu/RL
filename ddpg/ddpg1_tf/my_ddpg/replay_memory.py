@@ -10,7 +10,7 @@ class ReplayMemory(object):
 
     def get_batch(self, batch_size):
         # Randomly sample batch_size examples
-        return random.sample(self.buffer, memory_size)
+        return random.sample(self.buffer, batch_size)
 
     def size(self):
         return self.memory_size
@@ -32,3 +32,7 @@ class ReplayMemory(object):
     def erase(self):
         self.buffer = deque()
         self.num_experiences = 0
+
+if __name__ =="__main__":
+    replay_memory = ReplayMemory(100)
+

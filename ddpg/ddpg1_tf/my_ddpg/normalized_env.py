@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-def makeNormalizededEnv(env):
+def makeNormalizedEnv(env):
   """ crate a new environment class with actions and states normalized to [-1,1] """
   acsp = env.action_space
   obsp = env.observation_space
@@ -20,6 +20,7 @@ def makeNormalizededEnv(env):
       if np.any(obsp.high < 1e10):
         h = obsp.high
         l = obsp.low
+        
         sc = h-l
         self.o_c = (h+l)/2.
         self.o_sc = sc / 2.
@@ -30,6 +31,7 @@ def makeNormalizededEnv(env):
       # Action space
       h = acsp.high
       l = acsp.low
+    
       sc = (h-l)
       self.a_c = (h+l)/2.
       self.a_sc = sc / 2.
@@ -49,7 +51,7 @@ def makeNormalizededEnv(env):
     '''
       # Check and assign transformed spaces
       self.observation_space = gym.spaces.Box(self.normalize_observation(obsp.low),
-                                              self.normalzie_observation(obsp.high))
+                                              self.normalize_observation(obsp.high))
       self.action_space = gym.spaces.Box(-np.ones_like(acsp.high),np.ones_like(acsp.high))
       def assertEqual(a,b): assert np.all(a == b), "{} != {}".format(a,b)
       assertEqual(self.normalize_action(self.action_space.low), acsp.low)
@@ -67,7 +69,7 @@ def makeNormalizededEnv(env):
 
     def step(self,action):
 
-      ac_f = np.clip(self.nromalize_action(action),self.action_space.low,self.action_space.high)
+      ac_f = np.clip(self.normalize_action(action),self.action_space.low,self.action_space.high)
 
       obs, reward, term, info = env_type.step(self,ac_f) # super function
 
@@ -75,11 +77,20 @@ def makeNormalizededEnv(env):
 
       return obs_f, reward, term, info
 
-  fenv = NormalizedEnv()
+  nenv = NormalizedEnv()
 
   print('True action space: ' + str(acsp.low) + ', ' + str(acsp.high))
   print('True state space: ' + str(obsp.low) + ', ' + str(obsp.high))
-  print('Filtered action space: ' + str(fenv.action_space.low) + ', ' + str(fenv.action_space.high))
-  print('Filtered state space: ' + str(fenv.observation_space.low) + ', ' + str(fenv.observation_space.high))
+  print('Filtered action space: ' + str(nenv.action_space.low) + ', ' + str(nenv.action_space.high))
+  print('Filtered state space: ' + str(nenv.observation_space.low) + ', ' +
+          str(nenv.observation_space.high))
 
-  return fenv
+  return nenv
+
+if __name__=="__main__":
+    import gym
+    env = gym.make("Pendulum-v0")
+    nenv = makeNormalizedEnv(env)
+    obs = nenv.reset()
+    print obs
+    print env.step([0.5])
